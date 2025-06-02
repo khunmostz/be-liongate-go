@@ -45,7 +45,7 @@ Create a `.env` file in the root directory with the following variables:
 ```
 # Application
 APP_ENV=development
-SERVER_PORT=5000
+SERVER_PORT=8080
 DB_TYPE=postgres  # or mongodb
 
 # MongoDB
@@ -75,7 +75,7 @@ JWT_REFRESH_DURATION=168h # 7d
 docker-compose --env-file .env up -d
 ```
 
-The API will be available at http://localhost:5000
+The API will be available at http://localhost:8080
 
 ### Running Locally
 

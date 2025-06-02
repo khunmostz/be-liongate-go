@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/khunmostz/be-liongate-go/app/adapter/config"
@@ -76,7 +77,8 @@ func RegisterRoutes(
 			animalController.RegisterRoutes(router)
 			performanceStageController.RegisterRoutes(router)
 
-			go router.Run(":8080")
+			PORT := os.Getenv("SERVER_PORT")
+			go router.Run(":" + PORT)
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
