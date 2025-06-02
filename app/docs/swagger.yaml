@@ -1,0 +1,1106 @@
+basePath: /api/v1
+definitions:
+  domain.Animals:
+    properties:
+      animal_id:
+        type: string
+      name:
+        type: string
+      show_duration:
+        type: integer
+      species:
+        type: string
+      type:
+        type: string
+    type: object
+  domain.AuthResponse:
+    properties:
+      tokens:
+        $ref: '#/definitions/domain.TokenPair'
+      user:
+        $ref: '#/definitions/domain.Users'
+    type: object
+  domain.Bookings:
+    properties:
+      booking_id:
+        type: string
+      price:
+        type: number
+      qr_code:
+        type: string
+      round_id:
+        type: string
+      seat_number:
+        type: integer
+      user_id:
+        type: string
+    type: object
+  domain.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  domain.PerformanceStage:
+    properties:
+      price_per_seat:
+        type: number
+      room_number:
+        type: string
+      seat_capacity:
+        type: integer
+      stage_id:
+        type: string
+    type: object
+  domain.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    required:
+    - refresh_token
+    type: object
+  domain.RegisterRequest:
+    properties:
+      password:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  domain.ShowRounds:
+    properties:
+      animal_id:
+        type: string
+      bookings:
+        items:
+          $ref: '#/definitions/domain.Bookings'
+        type: array
+      round_id:
+        type: string
+      show_time:
+        type: string
+      stage_id:
+        type: string
+    type: object
+  domain.TokenPair:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+  domain.Users:
+    properties:
+      bookings:
+        items:
+          $ref: '#/definitions/domain.Bookings'
+        type: array
+      password:
+        type: string
+      role:
+        type: string
+      user_id:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: A Liongate service API in Go using Gin framework.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Liongate API
+  version: "1.0"
+paths:
+  /animals:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all animals
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Animals'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all animals
+      tags:
+      - animals
+    post:
+      consumes:
+      - application/json
+      description: Create a new animal with the provided information
+      parameters:
+      - description: Animal information
+        in: body
+        name: animal
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Animals'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Animals'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new animal
+      tags:
+      - animals
+  /animals/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete an animal by its ID
+      parameters:
+      - description: Animal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Animal not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete an animal
+      tags:
+      - animals
+    get:
+      consumes:
+      - application/json
+      description: Get an animal's information by its ID
+      parameters:
+      - description: Animal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Animals'
+        "404":
+          description: Animal not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get an animal by ID
+      tags:
+      - animals
+    put:
+      consumes:
+      - application/json
+      description: Update an animal's information
+      parameters:
+      - description: Animal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Animal information
+        in: body
+        name: animal
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Animals'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Animals'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Animal not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update an animal
+      tags:
+      - animals
+  /animals/{id}/perform-show/{roundId}:
+    post:
+      consumes:
+      - application/json
+      description: Record an animal performing a specific show round
+      parameters:
+      - description: Animal ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Show Round ID
+        in: path
+        name: roundId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ShowRounds'
+        "400":
+          description: Bad request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Animal or show round not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Animal performs a show round
+      tags:
+      - animals
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticate user with username and password
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful login
+          schema:
+            $ref: '#/definitions/domain.AuthResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: User login
+      tags:
+      - Authentication
+  /auth/refresh-token:
+    post:
+      consumes:
+      - application/json
+      description: Generate new access token using refresh token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: New token pair
+          schema:
+            $ref: '#/definitions/domain.TokenPair'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Refresh access token
+      tags:
+      - Authentication
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user account
+      parameters:
+      - description: Registration details
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/domain.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful registration
+          schema:
+            $ref: '#/definitions/domain.AuthResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: User registration
+      tags:
+      - Authentication
+  /bookings:
+    post:
+      consumes:
+      - application/json
+      description: Create a new booking with the provided information
+      parameters:
+      - description: Booking information
+        in: body
+        name: booking
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Bookings'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Bookings'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new booking
+      tags:
+      - bookings
+  /bookings/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a booking by its ID
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Booking not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a booking
+      tags:
+      - bookings
+    get:
+      consumes:
+      - application/json
+      description: Get a booking's information by its ID
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Bookings'
+        "404":
+          description: Booking not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a booking by ID
+      tags:
+      - bookings
+    put:
+      consumes:
+      - application/json
+      description: Update a booking's information
+      parameters:
+      - description: Booking ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Booking information
+        in: body
+        name: booking
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Bookings'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Bookings'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Booking not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a booking
+      tags:
+      - bookings
+  /bookings/round/{roundId}:
+    get:
+      consumes:
+      - application/json
+      description: Get all bookings for a specific show round
+      parameters:
+      - description: Round ID
+        in: path
+        name: roundId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Bookings'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get bookings by round ID
+      tags:
+      - bookings
+  /bookings/user/{userId}:
+    get:
+      consumes:
+      - application/json
+      description: Get all bookings for a specific user
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Bookings'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get bookings by user ID
+      tags:
+      - bookings
+  /show-rounds:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all show rounds
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.ShowRounds'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all show rounds
+      tags:
+      - show-rounds
+    post:
+      consumes:
+      - application/json
+      description: Create a new show round with the provided information
+      parameters:
+      - description: Show Round information
+        in: body
+        name: showRound
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ShowRounds'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.ShowRounds'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new show round
+      tags:
+      - show-rounds
+  /show-rounds/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a show round by its ID
+      parameters:
+      - description: Show Round ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Show round not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a show round
+      tags:
+      - show-rounds
+    get:
+      consumes:
+      - application/json
+      description: Get a show round's information by its ID
+      parameters:
+      - description: Show Round ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ShowRounds'
+        "404":
+          description: Show round not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a show round by ID
+      tags:
+      - show-rounds
+    post:
+      consumes:
+      - application/json
+      description: Get a show round's information by its ID
+      parameters:
+      - description: Show Round ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ShowRounds'
+        "404":
+          description: Show round not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a show round by ID
+      tags:
+      - show-rounds
+    put:
+      consumes:
+      - application/json
+      description: Update a show round's information
+      parameters:
+      - description: Show Round ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Show Round information
+        in: body
+        name: showRound
+        required: true
+        schema:
+          $ref: '#/definitions/domain.ShowRounds'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.ShowRounds'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Show round not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a show round
+      tags:
+      - show-rounds
+  /stages:
+    get:
+      consumes:
+      - application/json
+      description: Get a list of all performance stages
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.PerformanceStage'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all performance stages
+      tags:
+      - stages
+    post:
+      consumes:
+      - application/json
+      description: Create a new performance stage with the provided information
+      parameters:
+      - description: Performance Stage information
+        in: body
+        name: stage
+        required: true
+        schema:
+          $ref: '#/definitions/domain.PerformanceStage'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.PerformanceStage'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create a new performance stage
+      tags:
+      - stages
+  /stages/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a performance stage by its ID
+      parameters:
+      - description: Performance Stage ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a performance stage
+      tags:
+      - stages
+    get:
+      consumes:
+      - application/json
+      description: Get a performance stage's information by its ID
+      parameters:
+      - description: Performance Stage ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.PerformanceStage'
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a performance stage by ID
+      tags:
+      - stages
+    put:
+      consumes:
+      - application/json
+      description: Update a performance stage's information
+      parameters:
+      - description: Performance Stage ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated Performance Stage information
+        in: body
+        name: stage
+        required: true
+        schema:
+          $ref: '#/definitions/domain.PerformanceStage'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.PerformanceStage'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a performance stage
+      tags:
+      - stages
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a user by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success message
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete a user
+      tags:
+      - users
+    get:
+      consumes:
+      - application/json
+      description: Get a user's information by their ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Users'
+        "404":
+          description: User not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get a user by ID
+      tags:
+      - users
+    put:
+      consumes:
+      - application/json
+      description: Update a user's information
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Users'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Users'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: User not found
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update a user
+      tags:
+      - users
+  /users/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with the provided information
+      parameters:
+      - description: User information
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Users'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/domain.Users'
+        "400":
+          description: Invalid request body
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register a new user
+      tags:
+      - users
+  /users/role/{role}:
+    get:
+      consumes:
+      - application/json
+      description: Get all users with a specific role
+      parameters:
+      - description: User role
+        in: path
+        name: role
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Users'
+            type: array
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get users by role
+      tags:
+      - users
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

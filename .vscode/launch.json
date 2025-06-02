@@ -1,0 +1,38 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug DEV",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/app/cmd/main.go",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "APP_ENV": "dev"
+            }
+        },
+        {
+            "name": "Debug STG",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/app/cmd/main.go",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "APP_ENV": "stg"
+            }
+        },
+        {
+            "name": "Debug PROD",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/app/cmd/main.go",
+            "cwd": "${workspaceFolder}",
+            "env": {
+                "APP_ENV": "prod"
+            }
+        }
+    ]
+}
