@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/google/uuid"
 	"github.com/khunmostz/be-liongate-go/app/core/domain"
 )
 
@@ -191,23 +190,4 @@ func (j *JWTService) VerifyRefreshToken(tokenString string) (*domain.JWTClaims, 
 	}
 
 	return claims, nil
-}
-
-// CreateRefreshTokenRecord creates a refresh token record
-func (j *JWTService) CreateRefreshTokenRecord(userID, token string) *domain.RefreshToken {
-	return &domain.RefreshToken{
-		ID:        uuid.New().String(),
-		UserID:    userID,
-		Token:     token,
-		ExpiresAt: time.Now().Add(j.refreshTokenDuration),
-		CreatedAt: time.Now(),
-	}
-}
-
-// getEnvOrDefault returns environment variable value or default if not set
-func getEnvOrDefault(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
 }

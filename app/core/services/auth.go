@@ -24,6 +24,10 @@ func (s *AuthService) Login(ctx context.Context, req *domain.LoginRequest) (*dom
 		return nil, err
 	}
 
+	if user == nil {
+		return nil, errors.New("user not found")
+	}
+
 	valid := utils.IsPasswordValid(user.Password, req.Password)
 	if !valid {
 		return nil, errors.New("invalid password")
