@@ -100,6 +100,24 @@ func TestRegister(t *testing.T) {
 		assert.Nil(t, result)
 		mockRepo.AssertExpectations(t)
 	})
+
+	t.Run("username already exists", func(t *testing.T) {
+		user := &domain.Users{
+			Id:       "1",
+			Username: "testuser",
+			Password: "password",
+			Role:     "user",
+		}
+
+		expectedErr := errors.New("username already exists")
+		mockRepo.On("CreateUser", ctx, user).Return(nil, expectedErr).Once()
+
+		result, err := userService.Register(ctx, user)
+
+		assert.Error(t, err)
+		assert.Equal(t, expectedErr, err)
+		assert.Nil(t, result)
+	})
 }
 
 func TestGetUserById(t *testing.T) {
